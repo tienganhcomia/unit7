@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ms. Mia's English Class - Unit 7</title>
+    <style>
+        :root {
+            --bg-color: #fdf5e6;
+            --accent-color: #ff9a9e;
+            --text-color: #4a4a4a;
+            --highlight-color: #fff176;
+            --button-bg: #ffffff;
+            --active-button: #8ed1fc;
+            --shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(#ffe4b5 10%, transparent 10%),
+                linear-gradient(135deg, #fdf5e6 0%, #ffecd2 100%);
+            background-size: 30px 30px, 100% 100%;
+            color: var(--text-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Sidebar Navigation */
+        #sidebar {
+            width: 280px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            border-right: 2px solid rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        #logo-container {
+            position: sticky;
+            top: 0;
+            padding: 20px 10px;
+            text-align: center;
+            background: transparent;
+        }
+
+        #logo-container img {
+            max-width: 160px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+        }
+
+        h2 {
+            font-size: 1.4rem;
+            color: #d4a373;
+            text-align: center;
+            margin: 5px 0 15px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #button-list-wrapper {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 15px 20px 15px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .story-btn {
+            width: 100%;
+            background: var(--button-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-color);
+            transition: all 0.2s ease;
+            text-align: left;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .story-btn.active {
+            background: var(--active-button);
+            color: white;
+            border-color: #0693e3;
+        }
+
+        /* Main Reading Area */
+        #main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .instruction {
+            text-align: center;
+            font-weight: bold;
+            color: #b5835a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        #reading-box {
+            background: rgba(255, 255, 255, 0.92);
+            flex: 1;
+            border-radius: 35px;
+            padding: 40px;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            line-height: 1.7;
+            font-size: 2.1rem;
+            overflow-y: auto;
+            border: 6px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .word {
+            display: inline-block;
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 8px;
+            transition: background 0.1s;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .word.playing {
+            background: var(--highlight-color) !important;
+            transform: scale(1.1);
+        }
+
+        /* Mobile Layout Adjustments */
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            #sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 35vh;
+                border-right: none;
+                border-bottom: 2px solid white;
+            }
+            #logo-container { padding: 10px; }
+            #logo-container img { max-width: 100px; }
+            h2 { font-size: 1rem; margin: 0 0 5px 0; }
+            #button-list-wrapper {
+                display: flex;
+                flex-direction: row;
+                overflow-x: auto;
+                padding: 10px;
+                gap: 10px;
+            }
+            .story-btn {
+                width: auto;
+                white-space: nowrap;
+                margin-bottom: 0;
+                padding: 8px 12px;
+            }
+            #main-content { padding: 15px; }
+            #reading-box { font-size: 1.5rem; padding: 20px; border-radius: 20px; }
+            .instruction { font-size: 0.9rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav id="sidebar">
+        <div id="logo-container">
+            <img src="logo.png" alt="Ms. Mia Logo">
+        </div>
+        <h2>Unit 7</h2>
+        <div id="button-list-wrapper">
+            <div id="button-list"></div>
+        </div>
+    </nav>
+
+    <main id="main-content">
+        <div class="instruction">💻 Click a word | 📱 Double-tap a word</div>
+        <div id="reading-box"></div>
+    </main>
+
+    <script>
+        const stories = [
+            { title: "1. Morning, Noon, and Night", text: "Breakfast, lunch, and dinner.\nMorning, noon, and night.\n\nBreakfast in the morning,\nlunch comes at noon.\nDinner in the evening\nor when it is dark.\n\nBreakfast, lunch, and dinner.\nMorning, noon, and night." },
+            { title: "2. Shiver, Shiver, Br-r-r!", text: "My dog went out to swim one day.\nHe saw a friend who loves to play.\n“How are you, my friend, this day?”\n“I’m f-f-f-f-fine,” he said.\n“Oh, shiver, shiver, br-r-r!\nThe water’s very cold today!”" },
+            { title: "3. Have You Ever Seen a Monkey?", text: "Have you ever seen a monkey,\na monkey, a monkey?\nHave you ever seen a monkey\nbend this way and that?\n\nBend this way and that way\nand this way and that way.\nHave you ever seen a monkey\nbend this way and that?\n\nHave you ever seen an elephant,\nan elephant, an elephant?\nHave you ever seen an elephant\nmove this way and that?\n\nMove this way and that way\nand this way and that way.\nHave you ever seen an elephant\move this way and that?\n\nHave you ever seen a swallow,\na swallow, a swallow?\nHave you ever seen a swallow\nfly this way and that?\n\nFly this way and that way\nand this way and that way.\nHave you ever seen a swallow\nfly this way and that?" },
+            { title: "4. My Next Birthday", text: "May I have a new jump rope,\na doll that talks, a nice yo-yo?\nMay I have a teddy bear\non my next birthday?\n\nYou may have a new jump rope,\na doll that talks, a nice yo-yo!\nYou may have a teddy bear\non your next birthday!\n\nMay I have a box of blocks,\na yellow truck, some purple socks?\nMay I have some big balloons\non my next birthday?\n\nYou may have a box of blocks,\na yellow truck, some purple socks!\nYou may have some big balloons\non your next birthday!" },
+            { title: "5. Tonya Had a Little Lamb", text: "Tonya had a little lamb,\nlittle lamb, little lamb.\nTonya had a little lamb,\nand it was white as snow!\n\nEverywhere that Tonya went,\nTonya went, Tonya went,\neverywhere that Tonya went,\nthe lamb would always go.\n\nIt went with her to school one day,\nschool one day, school one day.\nIt went with her to school one day\nand jumped into the pool!\n\nIt made the children laugh and play,\nlaugh and play, laugh and play.\nIt made the children laugh and play\nto see a lamb at school." },
+            { title: "6. Keep Warm, Please!", text: "It is fun to wear\nshorts when it’s hot.\nIt is nice to wear\na t-shirt when it’s warm.\nIt’s better to wear\na jacket when it’s cool.\nAnd it is best to wear\na coat when it’s cold!\n\nSo, keep your body\nwarm, please. Please!\nNobody likes it when\nyou cough or sneeze. Ah-choo!\nIt is never fun when\nyou are sick—oh, no—\nor when you have\nto talk like this!" },
+            { title: "7. Yes, I Will!", text: "What will you do?\nWill you run and hide?\nNo, I won’t. I will not!\nWill you play with me?\nYes, I will! I will play with you.\n\nWhat will you do?\nWill you go without me?\nNo, I won’t. I will not!\nWill you go with me?\nYes, I will! I will go with you.\n\nWhat will you do?\nWill you play inside?\nNo, I won’t. I will not!\nWill you play outside?\nYes, I will! I will play outside.\n\nWhat will you do?\nWill you get your clothes wet?\nNo, I won’t. I will not!\nWill you keep your clothes dry?\nYes, I will! I will keep my clothes dry.\n\nWhat will you do?\nWill you wear your shoes inside?\nNo, I won’t. I will not!\nWill you take them off?\nYes, I will! I will take them off.\n\nWhat will you do?\nWill you stop cleaning and play?\nNo, I won’t. I will not!\nWill you help me clean up?\nYes, I will! I will help you clean up." },
+            { title: "8. Freeze!", text: "List 1\nShout your name.\nJump up and down.\nMake a circle.\nPoint to the door.\nHide your ears.\nTiptoe in a circle.\nTouch your knees.\nPush your cheeks out and in.\nWalk fast.\nWalk slow.\nTurn around and around again.\nSit down and then stand up.\nRub your stomach.\nWiggle your shoulders.\nWave your hand.\nHold your nose.\nLook under your left foot.\n\nList 2\nFeel your face.\nWiggle your toes.\nTouch your back.\nCount your buttons.\nTouch your hair.\nWiggle your chin.\nPoint to a girl.\nPoint to a boy.\nHold one leg and hop on the other leg.\nTouch the ground and then stand tall.\nHide your chin.\nWiggle your lips.\nPut your hand over your head.\nPoint to the floor.\nLook under your right foot.\nLook out the window.\nWash your hands.\nFreeze!" },
+            { title: "9. Toys", text: "I have nice toys\nand puzzles.\nSee my truck and bear?\nI like my turtle puppet,\nsitting in my chair!" },
+            { title: "10. Yellow Yo-Yo", text: "Open the box.\nWhat do I see?\nA yellow yo-yo\njust for me." },
+            { title: "11. I Love “V”", text: "Look and you’ll see\nV everywhere—\nin vegetables, in glove,\nand in number five,\nin Marvin, shiver, and\nwave, and even a\nbig beehive!" },
+            { title: "12. White", text: "I have a\nwhite yo-yo.\nI have a\nwhite box.\nI have a\nwhite puppet.\nI have some\nwhite socks.\n\nI have a\nwhite rabbit\nthat has long,\nwhite hair.\nI have a\nwhite ball\nand a white\nteddy bear.\nWhite, white,\nwhite, white…" },
+            { title: "13. Seven", text: "I count seven\ndolls.\nI count seven\nblocks.\nI count seven\npuzzles,\neach in a\nsquare box.\n\nI count seven\nballs and\nseven more\ntoys.\nI count seven\nfriends—\nsome girls and\nsome boys." },
+            { title: "14. The Weather Song", text: "What’s it like outside today?\nThe sun is out, so I will say,\n“It’s sunny! It’s sunny!\nAnd it’s hot!”\n\nWhat’s it like outside today?\nThe clouds are big, so I will say,\n“It’s cloudy! It’s cloudy!\nAnd it’s warm!”\n\nWhat’s it like outside today?\nThe wind is blowing. I will say,\n“It’s windy! It’s windy!\nAnd it’s cool!”\n\nWhat’s it like outside today?\nThe snow is falling. I will say,\n“It’s snowy! It’s snowy!\nAnd it’s cold!”\n\nWhat’s it like outside today?\nThe rain is falling. I will say,\n“It’s rainy! It’s rainy!\nAnd it’s wet!”\n\nWhat’s it like when it is day?\nThe sky is bright, so I will say,\n“It’s daytime! It’s daytime!\nAnd it’s light!”\n\nWhat’s it like when it is night?\nThe sky is black so I will say,\n“It’s nighttime! It’s nighttime!\nAnd it’s dark!”\n\nWhat’s it like outside today?" },
+            { title: "15. Birthday Fun", text: "I want to tell you about my birthday party.\nThe weather was sunny, hot, and dry.\nWe went swimming together and got all wet.\nI had ice cream at my party.\nI always blow out the candles on my cake.\nMy friends gave me a teddy bear and a puzzle.\n\nLet me tell you about my party!\nThe weather was cool and rainy.\nWe walked in the rain.\nWe saw a rainbow.\nAt my party, I had balloons and ribbons—\nall different colors.\nMy grandfather gave me a yo-yo and blocks.\nThey were the same color.\n\nOn my birthday, the weather was windy, snowy, and cold!\nThe wind was blowing; the trees were bending.\nFirst, we played in the snow.\nNext, we made a snowman.\nAnd last, we threw snowballs.\nI got a new sled for my birthday.\n\nOn my birthday, the weather was cloudy and warm.\nWe went to the playground.\nWe like to bounce balls and throw them to each other.\nMy mother gave me a jump rope\nand a doll in a box.\n\nLet me tell you about my birthday.\nMy party was at night, when it was dark.\nWe looked at the moon and counted the bright stars.\nI got many presents for my birthday.\nOne of them was a puppet.\nAnother one was a toy zebra.\n\nHow was the weather on your birthday?\nAnd did you get any presents?" },
+            { title: "16. Marvin’s Birthday Party", text: "Today is Marvin Monkey’s birthday.\nHe is coming to school for his birthday party!\nThe teacher made a birthday cake.\nShe put candles on the cake.\nThe boys and girls got presents for Marvin.\nThey put ribbons on the presents.\nBoth boys and girls hang up balloons in their classroom.\nNow it’s time for the party to start!\n\nMarvin is always glad to see his friends.\nHe sees the balloons and the birthday cake and the presents!\n“Open your presents, Marvin!” shout the boys and girls.\n“Take off the paper. See what we got for you!”\n\nMarvin opens the first present.\nIt is a teddy bear.\nMarvin holds the teddy bear in his arms\nbefore he opens the next present.\n\nThe next present is a yo-yo.\nMarvin watches the yo-yo go down and up,\nout and in, up and down.\n\nThen Marvin opens another box.\nThere is a puzzle in the box.\nMarvin does not know how to play with a puzzle.\nHe turns it over, and it all falls on the floor!\nThe boys and girls laugh.\nTogether, they help him pick it up.\n\nMarvin opens another present.\nHe gets a puppet.\nIt looks just like Marvin!\nBut Marvin has never seen a puppet.\nOne of the boys shows him what to do with it.\n\nThen Marvin opens his last present.\nIt is a ball.\nMarvin knows how to play with a ball!\nHe bounces it all around the room!\n\n“Come here and blow out the candles on your cake,”\nthe boys and girls say to Marvin.\nBut Marvin cannot blow,\nso the boys and girls help him.\nThen they all eat ice cream and cake.\nDo you know who ate the most?\n\nNow it is time for Marvin to go home.\nHe thinks, “This was a great birthday party!\nI had so much fun!”" },
+            { title: "17. Fun in the Snow", text: "It is a rainy day.\nRain is falling from the sky.\nWe must play inside.\nMy sisters play together.\nThey are quiet.\nThey put together a big puzzle.\n\nMy brother and I play together.\nSome blocks are the same\nand some are different.\nWe put together a nice house.\nThen the sun comes out.\nAnd we see a rainbow in the sky.\nA rainbow always has many colors.\n\nThat night, we look out the window.\nIt’s dark outside.\nBut the moon is very bright.\nWe can see many stars.\n“Good night, Father!” we say.\nThen we go to sleep.\n\nThe next morning,\nthere is snow all over the ground!\n“Yay!” we shout!\n“Today we can play outside in the snow.”\nFirst, we put on our nice, warm coats.\nNext, we put on warm gloves and hats.\nAnd last, we put on our boots.\nNow we can play outside.\n\nIt starts to snow again.\nThe girls make snowballs with the soft snow.\n“Let’s make a great, big snowman!”\nWe give our snowman a carrot nose.\nWe give him donut eyes and a banana mouth.\nHe is a very funny snowman!\n\n“Let’s slide down the hill on our sleds!\nI’m first!”\n“And I’m next!”\n“Okay, I’ll be last!”\nWe take turns sliding down the hill.\n\n“Let’s throw snowballs!”\nSo we make many snowballs.\nWe throw them at each other.\nNow we are cold and hungry and thirsty.\nSo we go inside, where it is warm.\nWe eat cookies and drink milk.\nWe tell Mother about all the fun\nwe had playing in the snow!" },
+            { title: "18. Jonny Bear Sees Marvin Monkey", text: "Mrs. Bear is fixing soup for dinner.\nAfter she puts meat in the soup,\nshe puts in vegetables from the garden.\nThen she puts in rice too.\nJonny’s stomach is empty!\nHe is hungry and thirsty.\nThe soup smells good,\nbut he is so sleepy.\nHe yawns, and then…\n\nJonny saw Marvin Monkey and his funny friends.\nOne of them was wearing a glove.\nWhen did those monkeys come into his house?\n“Excuse me!” said Jonny.\n“You may not be here!\nYou’ll have to go right now!”\nJonny talked, but the monkeys did not listen!\n\nMarvin showed a cookie and some chips to a friend.\nHis friend ate a bread and jam sandwich.\nThen butter, turkey, donuts, and salad were flying everywhere.\nThen one of the monkeys kicked some candy off the table.\nThe other monkey pinched Marvin,\ntinkering didn’t hurt.\nThe fat monkey put an egg on his head.\n“Stop!” yelled Jonny.\n“I got that egg from my hen.\nIt is for my breakfast!”\nBut the monkey just scratched his head.\n\nThen the thin monkey picked up some spaghetti\nand spilled it on Jonny.\nThen some ice cream hit him.\nJonny sneezed.\nThe monkeys were having so much fun!\nHamburgers, hot dogs, cake, and sweets were everywhere!\nTwo monkeys had cheese and noodles on them.\n“Hurray!” they shouted.\n“Look at all this food!”\n\nThe monkeys ate ham, pizza, pancakes, and popcorn.\nAgain Jonny cried,\n“Stop! That food is for my picnic lunch.”\nBut the monkeys did not listen.\n\nMarvin sat down to drink some juice.\nAfter the juice, he had some milk.\nThen he was full.\nHe was so full that he coughed and said,\n“Bye-bye!”\n“Thank you, Jonny!”\n“Before you go, clean this room!” said Jonny.\n“If you don’t, I’ll have to clean it myself!”\n\n“Jonny, wake up!” says his mother.\n“You were shouting!”\n“Oh, Mother,” says Jonny.\n“I had a fight with some monkeys in my sleep!”" }
+        ];
+
+        const buttonList = document.getElementById('button-list');
+        const readingBox = document.getElementById('reading-box');
+        const synth = window.speechSynthesis;
+        let preferredVoice = null;
+        let speechAllowed = false;
+
+        function setPreferredVoice() {
+            const voices = synth.getVoices();
+            preferredVoice = voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Samantha'))) || 
+                             voices.find(v => v.lang === 'en-US') || 
+                             voices[0];
+        }
+
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = setPreferredVoice;
+        }
+
+        function enableAudioOniOS() {
+            if (!speechAllowed) {
+                const initialUtterance = new SpeechSynthesisUtterance("");
+                synth.speak(initialUtterance);
+                speechAllowed = true;
+            }
+        }
+        
+        document.body.addEventListener('touchstart', enableAudioOniOS, { passive: true });
+        document.body.addEventListener('click', enableAudioOniOS);
+
+        function init() {
+            buttonList.innerHTML = '';
+            stories.forEach((story, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'story-btn';
+                btn.innerText = story.title;
+                btn.onclick = () => loadStory(index);
+                buttonList.appendChild(btn);
+            });
+            loadStory(0);
+            setPreferredVoice();
+        }
+
+        function loadStory(index) {
+            const buttons = document.querySelectorAll('.story-btn');
+            buttons.forEach((btn, i) => btn.classList.toggle('active', i === index));
+
+            readingBox.innerHTML = '';
+            const lines = stories[index].text.split('\n');
+
+            lines.forEach(line => {
+                if (line.trim() === "") {
+                    readingBox.appendChild(document.createElement('br'));
+                    return;
+                }
+                const lineDiv = document.createElement('div');
+                const parts = line.split(/(\s+)/); 
+
+                parts.forEach(part => {
+                    if (part.trim() === "") {
+                        lineDiv.appendChild(document.createTextNode(part));
+                    } else {
+                        const span = document.createElement('span');
+                        span.className = 'word';
+                        span.innerText = part;
+
+                        let lastTap = 0;
+
+                        // Touch Path for Mobile Devices
+                        span.addEventListener('touchend', function(e) {
+                            const currentTime = new Date().getTime();
+                            const tapLength = currentTime - lastTap;
+                            if (tapLength < 300 && tapLength > 0) {
+                                e.preventDefault();
+                                speak(part, span);
+                            }
+                            lastTap = currentTime;
+                        });
+
+                        // Click Path for Desktop
+                        span.addEventListener('click', function(e) {
+                            if (e.pointerType !== 'touch') {
+                                speak(part, span);
+                            }
+                        });
+
+                        span.addEventListener('contextmenu', e => e.preventDefault());
+                        lineDiv.appendChild(span);
+                    }
+                });
+                readingBox.appendChild(lineDiv);
+            });
+            readingBox.scrollTop = 0;
+        }
+
+        function speak(word, element) {
+            document.querySelectorAll('.word.playing').forEach(el => el.classList.remove('playing'));
+            synth.cancel();
+
+            const cleanWord = word.replace(/[.,!?;:””’\"“\"]/g, "");
+            const utterance = new SpeechSynthesisUtterance(cleanWord);
+            
+            utterance.rate = 0.65; 
+            utterance.pitch = 1.1;
+            
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            } else {
+                utterance.lang = 'en-US';
+            }
+
+            utterance.onstart = () => element.classList.add('playing');
+            utterance.onend = () => element.classList.remove('playing');
+            
+            synth.speak(utterance);
+        }
+
+        init();
+    </script>
+</body>
+</html>
